@@ -27,7 +27,9 @@ jobs:
       - name: Install Qt
         uses: tecolicom/actions-use-homebrew-tools@v1
         with:
-          tools: 'qt@5'
+          tools:
+          - 'qt@5'
+          - ninja
           cache: no
           verbose: no
 
