@@ -27,11 +27,9 @@ jobs:
       - name: Install Qt
         uses: tecolicom/actions-use-homebrew-tools@v1
         with:
-          tools:
-          - 'qt@5'
-          - ninja
-          cache: no
-          verbose: no
+          tools: 'qt@5 ninja'
+          cache: true
+          verbose: true
 
       - name: Build App
         uses: lukka/run-cmake@v10
