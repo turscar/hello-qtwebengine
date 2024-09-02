@@ -1,0 +1,77 @@
+name: build
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    name: Build for macOS
+    env:
+      APPNAME: hello-qtwebengine
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+
+#      - name: Install Qt
+#        uses: jurplel/install-qt-action@v4
+#        with:
+#          version: '5.15.2'
+#          dir: ${{ runner.temp }}
+#          modules: qtwebengine
+#          cache: true
+
+      - name: Install Qt
+        uses: tecolicom/actions-use-homebrew-tools@v1
+        with:
+          tools: 'qt@5'
+          cache: no
+          verbose: no
+
+      - name: Build App
+        uses: lukka/run-cmake@v10
+        env:
+          CMAKE_PREFIX_PATH: '/opt/homebrew/opt/qt@5'
+        with:
+          configurePreset: 'default'
+          buildPreset: 'default'
+
+      - name: Package App with macdeployqt
+        shell: bash
+        run: |
+          mkdir scratch
+          cp -a "build/default/${APPNAME}.app" "scratch/${APPNAME}.app"
+          cd scratch
+          macdeployqt "${APPNAME}.app" -appstore-compliant -hardened-runtime
+      - name: List
+        run: |
+            echo "Looking at ${{ github.repository }}"
+            find . -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
+#
+#      - name: Set up code signing certificates
+#        uses: apple-actions/import-codesign-certs@v3
+#        with:
+#          p12-file-base64: ${{ secrets.PROD_MACOS_APP_CERTIFICATE }}
+#          p12-password: ${{ secrets.PROD_MACOS_APP_CERTIFICATE_PWD }}
+#
+#      - name: Sign App
+#        env:
+#          TEAM_ID: ${{ vars.PROD_MACOS_TEAM_ID }}
+#        shell: bash
+#        run: |
+#          security find-identity -p codesigning -v signing_temp.keychain | grep "Developer ID Application:.*${TEAM_ID}"
+#          CERT_ID=$(security find-identity -p codesigning -v signing_temp.keychain | grep "Developer ID Application:.*${TEAM_ID}" | awk 'NR==1{print $2}')
+#          codesign --force --sign="${CERT_ID}" --keychain="signing_temp.keychain" --options=runtime --entitlements "scratch/${APPNAME.app}/Contents/Frameworks/QtWebEngineCore.framework/Versions/5/Helpers/QtWebEngineProcess.app/Contents/Resources/QtWebEngineProcess.entitlements" "scratch/${APPNAME.app}/Contents/Frameworks/QtWebEngineCore.framework/Versions/5/Helpers/QtWebEngineProcess.app"
+#          find "scratch/${APPNAME}.app/Contents" -type f -and -perm +111 -and -name '*.dylib' -print0 | xargs -0 codesign --force --sign="${CERT_ID}" --keychain="signing_temp.keychain" --options=runtime
+#          find "scratch/${APPNAME}.app/Contents/Frameworks" -type d -and -name '*.framework' -print0 | xargs -0 codesign --force --sign="${CERT_ID}" --keychain="signing_temp.keychain" --options=runtime
+#          codesign --force --sign="${CERT_ID}" --keychain="signing_temp.keychain" --options=runtime --entitlements entitlements.plist "scratch/${APPNAME}.app"
+
+      - name: Package app as dmg
+        uses: turscar/macos-dmg@main
+        with:
+          app: scratch/${APPNAME}.app
+
+          
