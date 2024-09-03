@@ -36,6 +36,12 @@ jobs:
         shell: bash
         run: echo "::addPath /opt/homebrew/opt/qt@5/bin"
 
+      - name: Show PATH
+        shell: bash
+        run: |
+          echo "PATH=$PATH"
+          find /opt/homebrew/opt/qt@5/bin -ls
+
       - name: Build App
         uses: lukka/run-cmake@v10
         env:
