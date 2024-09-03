@@ -34,7 +34,7 @@ jobs:
 
       - name: Setup PATH
         shell: bash
-        run: echo "::addPath /opt/homebrew/opt/qt@5/bin"
+        run: echo "::addPath::/opt/homebrew/opt/qt@5/bin"
 
       - name: Show PATH
         shell: bash
