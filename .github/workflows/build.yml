@@ -34,7 +34,7 @@ jobs:
 
       - name: Setup PATH
         shell: bash
-        run: echo "PATH=/opt/homebrew/opt/qt@5/bin:$PATH" >> "$GITHUB_ENV"
+        run: echo "::addPath /opt/homebrew/opt/qt@5/bin"
 
       - name: Build App
         uses: lukka/run-cmake@v10
@@ -77,6 +77,6 @@ jobs:
       - name: Package app as dmg
         uses: turscar/macos-dmg@main
         with:
-          app: scratch/${APPNAME}.app
+          app: scratch/{{ env.APPNAME }}.app
 
           
