@@ -25,12 +25,16 @@ jobs:
 #          modules: qtwebengine
 #          cache: true
 
-      - name: Install Qt
+      - name: Install Dependencies from Homebrew
         uses: tecolicom/actions-use-homebrew-tools@v1
         with:
           tools: 'qt@5 ninja'
-          cache: true
+          cache: yes
           verbose: true
+
+      - name: Setup PATH
+        shell: bash
+        run: echo "PATH=/opt/homebrew/opt/qt@5/bin:$PATH" >> "$GITHUB_ENV"
 
       - name: Build App
         uses: lukka/run-cmake@v10
