@@ -36,11 +36,6 @@ jobs:
         shell: bash
         run: echo /opt/homebrew/opt/qt@5/bin >> "$GITHUB_PATH"
 
-      - name: Show PATH
-        shell: bash
-        run: |
-          echo "PATH=$PATH"
-
       - name: Build App
         uses: lukka/run-cmake@v10
         env:
@@ -56,10 +51,10 @@ jobs:
           cp -a "build/default/${APPNAME}.app" "scratch/${APPNAME}.app"
           cd scratch
           macdeployqt "${APPNAME}.app" -appstore-compliant -hardened-runtime
-      - name: List
-        run: |
-            echo "Looking at ${{ github.repository }}"
-            find . -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
+#      - name: List
+#        run: |
+#            echo "Looking at ${{ github.repository }}"
+#            find . -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
 #
 #      - name: Set up code signing certificates
 #        uses: apple-actions/import-codesign-certs@v3
@@ -82,6 +77,6 @@ jobs:
       - name: Package app as dmg
         uses: turscar/macos-dmg@main
         with:
-          app: scratch/{{ env.APPNAME }}.app
+          app: scratch/${{ env.APPNAME }}.app
 
           
